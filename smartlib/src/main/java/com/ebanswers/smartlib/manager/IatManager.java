@@ -6,6 +6,7 @@ import android.os.Environment;
 
 import com.ebanswers.smartlib.callback.IatResultCallback;
 import com.ebanswers.smartlib.util.LogUtil;
+import com.ebanswers.smartlib.util.TuningBotUtil;
 import com.iflytek.cloud.ErrorCode;
 import com.iflytek.cloud.InitListener;
 import com.iflytek.cloud.RecognizerListener;
@@ -13,6 +14,10 @@ import com.iflytek.cloud.RecognizerResult;
 import com.iflytek.cloud.SpeechConstant;
 import com.iflytek.cloud.SpeechError;
 import com.iflytek.cloud.SpeechRecognizer;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.json.JSONTokener;
 
 /**
  * Created by Callanna on 2016/8/4.
@@ -30,7 +35,7 @@ public class IatManager {
         mIat = SpeechRecognizer.createRecognizer(context, mInitListener);
     }
 
-    private InitListener mInitListener = new InitListener() {
+    private  InitListener mInitListener = new InitListener() {
         @Override
         public void onInit(int code) {
             LogUtil.d("duanyl===========>SpeechRecognizer init() code = " + code);
@@ -70,7 +75,7 @@ public class IatManager {
 
     }
 
-    public IatManager getInstance(Context context) {
+    public static IatManager getInstance(Context context) {
         synchronized (IatManager.class) {
             if (instance == null) {
                 instance = new IatManager(context);
@@ -127,8 +132,9 @@ public class IatManager {
         @Override
         public void onResult(RecognizerResult results, boolean isLast) {
             LogUtil.d("duanyl=================>"+results.getResultString());
-            if (isLast) {
-                callback.onResult(results.getResultString());
+            if (isLast) {//最后的结果
+                String result= parseResult(results.getResultString());
+                callback.onResult(smartBotAnswer(result));
             }
         }
 
@@ -148,6 +154,29 @@ public class IatManager {
         }
     };
 
+    private String smartBotAnswer(String result) {
+        String answer = TuningBotUtil.sendMsg(result);
+        return answer;
+    }
+
+    private String parseResult(String resultString) {
+        StringBuffer ret = new StringBuffer();
+        try {
+            JSONTokener tokener = new JSONTokener(resultString);
+            JSONObject joResult = new JSONObject(tokener);
+
+            JSONArray words = joResult.getJSONArray("ws");
+            for (int i = 0; i < words.length(); i++) {
+                // 转写结果词，默认使用第一个结果
+                JSONArray items = words.getJSONObject(i).getJSONArray("cw");
+                JSONObject obj = items.getJSONObject(0);
+                ret.append(obj.getString("w"));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return ret.toString();
+    }
 
 
 }

@@ -5,7 +5,9 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 
 import com.ebanswers.smartlib.callback.IFLYRecognizerCallback;
+import com.ebanswers.smartlib.service.SmartBotService;
 import com.ebanswers.smartlib.service.SpeechRecognizerService;
+import com.ebanswers.smartlib.service.TuningBotService;
 import com.ebanswers.smartlib.util.LogUtil;
 import com.iflytek.cloud.SpeechUtility;
 
@@ -20,6 +22,8 @@ public class SmartBot {
     public static String command ;
     public static String recoginertype =  "";
     public static SpeechRecognizerService recognizerService;
+    public static SmartBotService smartBotService;
+    public static TuningBotService tuningBotService;
 
     /**
         建议在Application里初始化
@@ -72,7 +76,60 @@ public class SmartBot {
 
     /**
      *   ====================================================语音识别========end===============
+          ================================================================================
+     ============================================================================
      */
+
+
+    /**
+     *   ====================================================SmartBot=======================
+     */
+    public static void initSmartBot(){
+        mContext.get().startService(new Intent(mContext.get(),SmartBotService.class));
+    }
+
+    public static void startListening(){
+        if(smartBotService != null){
+            smartBotService.startUnderstand();
+        }
+    }
+
+    public static void stopListening(){
+        if(smartBotService != null){
+            smartBotService.stopUnderstand();
+        }
+    }
+
+    public static void releaseBot(){
+        if (smartBotService != null){
+            smartBotService.onDestroy();
+        }
+    }
+
+    /**
+     *   ====================================================TuningBot=======================
+     */
+    public static void initTuningBot(){
+        mContext.get().startService(new Intent(mContext.get(),TuningBotService.class));
+    }
+
+    public static void startTuningListening(){
+        if(tuningBotService != null){
+            tuningBotService.startUnderstand();
+        }
+    }
+
+    public static void stopTuningListening(){
+        if(tuningBotService != null){
+            tuningBotService.stopUnderstand();
+        }
+    }
+
+    public static void releaseTuningBot(){
+        if (tuningBotService != null){
+            tuningBotService.onDestroy();
+        }
+    }
 
 
 }

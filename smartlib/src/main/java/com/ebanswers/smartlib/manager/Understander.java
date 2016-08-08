@@ -123,6 +123,7 @@ public class Understander {
         public void onBeginOfSpeech() {
             // 此回调表示：sdk内部录音机已经准备好了，用户可以开始语音输入
             LogUtil.d("duanyl==========>开始说话");
+            callback.onEndSpeech();
         }
 
         @Override

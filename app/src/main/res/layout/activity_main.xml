@@ -4,25 +4,109 @@
     android:layout_height="match_parent"
     android:gravity="center"
     android:orientation="vertical">
+    <TextView
+        android:id="@+id/tv_one"
+        android:text="SpeechRecognizeService"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+     <LinearLayout
+         android:orientation="horizontal"
+         android:layout_width="match_parent"
+         android:layout_height="100dp">
+         <Button
+             android:id="@+id/btn_init_speechrecognize"
+             android:text="@string/start_service"
+             android:layout_width="100dp"
+             android:layout_height="60dp" />
+         <Button
+             android:id="@+id/btn_speechrecognizer"
+             android:layout_width="100dp"
+             android:layout_height="60dp"
+             android:text="开始识别"
+             android:textSize="16sp" />
 
-    <Button
-        android:id="@+id/btn_speechrecognizer"
-        android:layout_width="200dp"
-        android:layout_height="60dp"
-        android:text="开始识别"
-        android:textSize="20sp" />
+         <Button
+             android:id="@+id/btn_stoprecognize"
+             android:layout_width="100dp"
+             android:layout_height="60dp"
+             android:text="停止识别"
+             android:textSize="16sp" />
+         <Button
+             android:id="@+id/btn_destroy_recognize"
+             android:layout_width="100dp"
+             android:layout_height="60dp"
+             android:text="@string/stop_service"
+             android:textSize="16sp" />
+     </LinearLayout>
 
-    <Button
-        android:id="@+id/btn_stoprecognize"
-        android:layout_width="200dp"
-        android:layout_height="60dp"
-        android:text="停止识别"
-        android:textSize="20sp" />
-
-    <Button
-        android:id="@+id/btn_smartbot"
-        android:layout_width="200dp"
-        android:layout_height="60dp"
+    <TextView
+        android:id="@+id/tv_two"
         android:text="SmartBot"
-        android:textSize="20sp" />
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="100dp">
+        <Button
+            android:id="@+id/btn_init_smartbot"
+            android:text="@string/start_service"
+            android:layout_width="100dp"
+            android:layout_height="60dp" />
+        <Button
+            android:id="@+id/btn_smartbot_start"
+            android:layout_width="100dp"
+            android:layout_height="60dp"
+            android:text="开始"
+            android:textSize="16sp" />
+
+        <Button
+            android:id="@+id/btn_smartbot_stop"
+            android:layout_width="100dp"
+            android:layout_height="60dp"
+            android:text="停止"
+            android:textSize="16sp" />
+        <Button
+            android:id="@+id/btn_destroy_smartbot"
+            android:layout_width="100dp"
+            android:layout_height="60dp"
+            android:text="@string/stop_service"
+            android:textSize="16sp" />
+    </LinearLayout>
+    <TextView
+        android:id="@+id/tv_three"
+        android:text="TuningBot"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="100dp">
+        <Button
+            android:id="@+id/btn_init_tuningbot"
+            android:text="@string/start_service"
+            android:layout_width="100dp"
+            android:layout_height="60dp" />
+
+        <Button
+            android:id="@+id/btn_tuningbot_start"
+            android:layout_width="100dp"
+            android:layout_height="60dp"
+            android:text="开始"
+            android:textSize="16sp" />
+
+        <Button
+            android:id="@+id/btn_tuningbot_stop"
+            android:layout_width="100dp"
+            android:layout_height="60dp"
+            android:text="停止"
+            android:textSize="16sp" />
+        <Button
+            android:id="@+id/btn_destroy_tuningbot"
+            android:layout_width="100dp"
+            android:layout_height="60dp"
+            android:text="@string/stop_service"
+            android:textSize="16sp" />
+    </LinearLayout>
+
 </LinearLayout>

@@ -1,4 +1,5 @@
 package com.ebanswers.smartlib.service;
+
 import android.app.Service;
 import android.content.Intent;
 import android.os.Handler;
@@ -7,18 +8,20 @@ import android.os.Message;
 import android.support.annotation.Nullable;
 
 import com.ebanswers.smartlib.SmartBot;
-import com.ebanswers.smartlib.callback.SpeechUnderstandCallback;
+import com.ebanswers.smartlib.callback.IatResultCallback;
+import com.ebanswers.smartlib.manager.IatManager;
 import com.ebanswers.smartlib.manager.TtsManager;
-import com.ebanswers.smartlib.manager.Understander;
-import com.ebanswers.smartlib.util.LogUtil;
 
 /**
- * Created by Callanna on 2016/8/4.
+ * Created by Callanna on 2016/8/5.
  */
-public class SmartBotService extends Service {
-    private Understander understander;
+public class TuningBotService extends Service {
+
+    private IatManager iatManager;
 
     private TtsManager ttsManager;
+
+
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
@@ -28,14 +31,14 @@ public class SmartBotService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        SmartBot.smartBotService = this;
-        understander = Understander.getInstance(this);
+        SmartBot.tuningBotService = this;
+        iatManager = IatManager.getInstance(this);
         ttsManager = TtsManager.getInstance(this);
-
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+
         return super.onStartCommand(intent, flags, startId);
     }
     Handler myhandler = new Handler(){
@@ -48,27 +51,31 @@ public class SmartBotService extends Service {
         }
     };
     public void startUnderstand() {
-        understander.startUnderstanding(new SpeechUnderstandCallback() {
+        iatManager.startRecognize(new IatResultCallback() {
             @Override
             public void onEndSpeech() {
                 myhandler.sendEmptyMessageDelayed(0,1000);
             }
 
             @Override
-            public void onResultUnderstand(String result) {
-                LogUtil.d("duanyl==============onResultUnderstand>"+result);
-                ttsManager.startSpeech("好的");
+            public void onResult(String text) {
+
+
+                ttsManager.startSpeech(text);
             }
 
             @Override
-            public void onFail(String msg) {
-                ttsManager.startSpeech("亲！什么？我没听清楚，再说一次！");
+            public void onfail(String msg) {
+
             }
         });
     }
-  public void stopUnderstand(){
-      understander.stopUnderstanding();
-  }
+    public void stopUnderstand(){
+        iatManager.stopRecognize();
+    }
+
+
+
     @Override
     public void onLowMemory() {
         super.onLowMemory();
@@ -79,6 +86,6 @@ public class SmartBotService extends Service {
     public void onDestroy() {
         super.onDestroy();
         ttsManager.destory();
-        understander.destory();
+        iatManager.destory();
     }
 }

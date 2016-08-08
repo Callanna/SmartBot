@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">SmartBot</string>
+    <string name="start_service">开启服务</string>
+    <string name="string_init_speechrecognize">初始化词令识别</string>
+    <string name="string_init_smartbot">初始化SmartBot</string>
+    <string name="string_init_tuningbot">初始化TuningBot</string>
+    <string name="stop_service">停止服务</string>
 </resources>
