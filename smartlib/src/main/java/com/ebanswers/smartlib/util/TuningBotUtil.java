@@ -27,17 +27,20 @@ public class TuningBotUtil {
     public static String sendMsg(String msg)
     {
         String answer = "sorry!我也无能为力了！";
+        LogUtil.d("duanyl==============>msg:"+msg);
         String url = setParams(msg);
         String res = doGet(url);
-        try {
-            JSONObject jsonObject = new JSONObject(res);
-            int code = jsonObject.getInt("code");
-            String text = jsonObject.getString("text");
-            if(!(code>40000 || text.equals("") ||text == null)){
-                 answer = text;
+        if(!res.equals("")) {
+            try {
+                JSONObject jsonObject = new JSONObject(res);
+                int code = jsonObject.getInt("code");
+                String text = jsonObject.getString("text");
+                if (!(code > 40000 || text.equals("") || text == null)) {
+                    answer = text;
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
-        } catch (JSONException e) {
-            e.printStackTrace();
         }
         return answer;
     }
@@ -120,6 +123,10 @@ public class TuningBotUtil {
             }
             conn.disconnect();
         }
-        return baos.toString();
+        if(baos != null) {
+            return baos.toString();
+        }else{
+            return "";
+        }
     }
 }

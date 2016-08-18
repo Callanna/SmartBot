@@ -68,7 +68,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 SmartBot.startRecognize(new IFLYRecognizerCallback() {
                     @Override
                     public void onRecognizerResult(IFlyJsonResult result) {
-                        LogUtil.d("duanyl=================>slots: "+result.getSlots().get(0)+"words: "+result.getWords().get(0));
+                        if(result.getWords().size()>0) {
+                            LogUtil.d("duanyl=================>words: " + result.getWords().get(0));
+                        }
                     }
                     @Override
                     public void tip(String msg) {}

@@ -127,6 +127,7 @@ public class IatManager {
         public void onEndOfSpeech() {
             // 此回调表示：检测到了语音的尾端点，已经进入识别过程，不再接受语音输入
             LogUtil.d("duanyl=================>结束说话");
+            callback.onEndSpeech();
         }
 
         @Override

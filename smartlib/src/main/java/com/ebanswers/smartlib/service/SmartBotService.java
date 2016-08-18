@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 
 import com.ebanswers.smartlib.SmartBot;
 import com.ebanswers.smartlib.callback.SpeechUnderstandCallback;
+import com.ebanswers.smartlib.callback.TtsSpeakCallback;
 import com.ebanswers.smartlib.manager.TtsManager;
 import com.ebanswers.smartlib.manager.Understander;
 import com.ebanswers.smartlib.util.LogUtil;
@@ -19,6 +20,8 @@ public class SmartBotService extends Service {
     private Understander understander;
 
     private TtsManager ttsManager;
+
+    private boolean stopListen = false;
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
@@ -51,18 +54,41 @@ public class SmartBotService extends Service {
         understander.startUnderstanding(new SpeechUnderstandCallback() {
             @Override
             public void onEndSpeech() {
-                myhandler.sendEmptyMessageDelayed(0,1000);
+                if(!stopListen)
+                   myhandler.sendEmptyMessageDelayed(0,1000);
             }
 
             @Override
             public void onResultUnderstand(String result) {
                 LogUtil.d("duanyl==============onResultUnderstand>"+result);
-                ttsManager.startSpeech("好的");
+                ttsManager.startSpeech(result, new TtsSpeakCallback() {
+                    @Override
+                    public void onStart() {
+                        stopUnderstand();
+                        stopListen = true;
+                    }
+
+                    @Override
+                    public void onEnd() {
+                        myhandler.sendEmptyMessageDelayed(0,1000);
+                        stopListen = false;
+                    }
+                });
             }
 
             @Override
             public void onFail(String msg) {
-                ttsManager.startSpeech("亲！什么？我没听清楚，再说一次！");
+                ttsManager.startSpeech("亲！什么？我没听清楚，再说一次！", new TtsSpeakCallback() {
+                    @Override
+                    public void onStart() {
+                        stopUnderstand();
+                    }
+
+                    @Override
+                    public void onEnd() {
+                        myhandler.sendEmptyMessageDelayed(0,1000);
+                    }
+                });
             }
         });
     }

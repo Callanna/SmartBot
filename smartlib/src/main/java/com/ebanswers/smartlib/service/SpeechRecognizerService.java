@@ -194,12 +194,12 @@ public class SpeechRecognizerService extends Service {
             LogUtil.d("duanyl===============confidence=>" + mIFlyJsonResult.getConfidence());
             for (int i = 0; i < words.length(); i++) {
                 JSONArray items = words.getJSONObject(i).getJSONArray("cw");
-                mIFlyJsonResult.addSlots(words.getJSONObject(i).getString("slot"));
+                //mIFlyJsonResult.addSlots(words.getJSONObject(i).getString("slot"));
                 JSONObject obj = items.getJSONObject(0);//曲该词槽的第一项
                 mIFlyJsonResult.addWords(obj.getString("w"));
             }
             for (int h = 0; h < mIFlyJsonResult.slots.size(); h++) {
-                LogUtil.d("duanyl=========>slot " + mIFlyJsonResult.slots.get(h) + "cword " + mIFlyJsonResult.words.get(h));
+                LogUtil.d("duanyl=========>  word " + mIFlyJsonResult.words.get(h));
             }
         } catch (Exception e) {
             e.printStackTrace();

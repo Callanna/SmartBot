@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.os.Environment;
 
+import com.ebanswers.smartlib.callback.TtsSpeakCallback;
 import com.ebanswers.smartlib.util.LogUtil;
 import com.iflytek.cloud.ErrorCode;
 import com.iflytek.cloud.InitListener;
@@ -19,7 +20,7 @@ public class TtsManager {
     private static  TtsManager instance;
     // 语音合成对象
     private SpeechSynthesizer mTts;
-
+    private TtsSpeakCallback callback;
     // 默认发音人
     private String voicer = "xiaoyan";
     private TtsManager(Context context){
@@ -77,6 +78,7 @@ public class TtsManager {
 
         @Override
         public void onSpeakBegin() {
+            callback.onStart();
             LogUtil.d("duanyl============>开始播放");
         }
 
@@ -106,6 +108,7 @@ public class TtsManager {
         public void onCompleted(SpeechError error) {
             if (error == null) {
                 LogUtil.d("duanyl===========播放完成");
+                callback.onEnd();
             } else if (error != null) {
                 LogUtil.d("duanyl==========="+error.getPlainDescription(true));
             }
@@ -122,7 +125,8 @@ public class TtsManager {
         }
     };
 
-    public void startSpeech(String text){
+    public void startSpeech(String text, TtsSpeakCallback callback){
+        this.callback = callback;
         if(mTts != null){
             mTts.startSpeaking(text,mTtsListener);
         }

@@ -9,6 +9,7 @@ import android.support.annotation.Nullable;
 
 import com.ebanswers.smartlib.SmartBot;
 import com.ebanswers.smartlib.callback.IatResultCallback;
+import com.ebanswers.smartlib.callback.TtsSpeakCallback;
 import com.ebanswers.smartlib.manager.IatManager;
 import com.ebanswers.smartlib.manager.TtsManager;
 
@@ -21,7 +22,7 @@ public class TuningBotService extends Service {
 
     private TtsManager ttsManager;
 
-
+    private boolean stopListen = false;
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
@@ -54,14 +55,26 @@ public class TuningBotService extends Service {
         iatManager.startRecognize(new IatResultCallback() {
             @Override
             public void onEndSpeech() {
-                myhandler.sendEmptyMessageDelayed(0,1000);
+                if(!stopListen) {
+                    myhandler.sendEmptyMessageDelayed(0, 1000);
+                }
             }
 
             @Override
             public void onResult(String text) {
+                ttsManager.startSpeech(text, new TtsSpeakCallback() {
+                    @Override
+                    public void onStart() {
+                        stopUnderstand();
+                        stopListen = true;
+                    }
 
-
-                ttsManager.startSpeech(text);
+                    @Override
+                    public void onEnd() {
+                        myhandler.sendEmptyMessageDelayed(0,1000);
+                        stopListen = false;
+                    }
+                });
             }
 
             @Override

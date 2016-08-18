@@ -28,7 +28,8 @@
         </activity>
 
         <service android:name="com.ebanswers.smartlib.service.SpeechRecognizerService"></service>
-
+        <service android:name="com.ebanswers.smartlib.service.SmartBotService"></service>
+        <service android:name="com.ebanswers.smartlib.service.TuningBotService"></service>
         <meta-data
             android:name="smartBotappId"
             android:value="57a302da" ></meta-data>
