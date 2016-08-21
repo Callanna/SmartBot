@@ -1,5 +1,6 @@
 package com.ebanswers.smartbot;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -48,6 +49,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     Button btnTuningbotStop;
     @Bind(R.id.btn_destroy_tuningbot)
     Button btnDestroyTuningbot;
+    @Bind(R.id.btn_view)
+    Button btn_view;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,7 +61,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
-    @OnClick({R.id.btn_init_speechrecognize, R.id.btn_speechrecognizer, R.id.btn_stoprecognize, R.id.btn_destroy_recognize, R.id.btn_init_smartbot, R.id.btn_smartbot_start, R.id.btn_smartbot_stop, R.id.btn_destroy_smartbot, R.id.btn_init_tuningbot, R.id.btn_tuningbot_start, R.id.btn_tuningbot_stop, R.id.btn_destroy_tuningbot})
+    @OnClick({R.id.btn_init_speechrecognize, R.id.btn_speechrecognizer, R.id.btn_stoprecognize, R.id.btn_destroy_recognize, R.id.btn_init_smartbot, R.id.btn_smartbot_start, R.id.btn_smartbot_stop, R.id.btn_destroy_smartbot, R.id.btn_init_tuningbot, R.id.btn_tuningbot_start, R.id.btn_tuningbot_stop, R.id.btn_destroy_tuningbot,R.id.btn_view})
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btn_init_speechrecognize:
@@ -105,6 +108,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.btn_destroy_tuningbot:
                 SmartBot.releaseTuningBot();
+                break;
+            case R.id.btn_view:
+                startActivity(new Intent(MainActivity.this,SecondActivity.class));
                 break;
         }
     }

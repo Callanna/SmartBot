@@ -82,11 +82,13 @@ public class SmartBotService extends Service {
                     @Override
                     public void onStart() {
                         stopUnderstand();
+                        stopListen = true;
                     }
 
                     @Override
                     public void onEnd() {
                         myhandler.sendEmptyMessageDelayed(0,1000);
+                        stopListen = false;
                     }
                 });
             }

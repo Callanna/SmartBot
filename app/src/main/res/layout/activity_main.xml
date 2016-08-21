@@ -107,6 +107,14 @@
             android:layout_height="60dp"
             android:text="@string/stop_service"
             android:textSize="16sp" />
+
     </LinearLayout>
+
+    <Button
+        android:id="@+id/btn_view"
+        android:text="WheelListView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+    </Button>
 
 </LinearLayout>
