@@ -93,6 +93,7 @@ public class IatManager {
     public void stopRecognize() {
         if (mIat != null) {
             mIat.stopListening();
+            mIat.cancel();
         }
     }
 
