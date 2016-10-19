@@ -162,16 +162,13 @@ public class SpeechRecognizerService extends Service {
         @Override
         public void onResult(RecognizerResult recognizerResult, boolean b) {
              LogUtil.d("duanyl============>recognizerResult: "+recognizerResult.getResultString());
-            if( iflyRecognizerCallback  != null) {
-               IFlyJsonResult iFlyJsonResult = parseGrammarResult(recognizerResult.getResultString());
-                iflyRecognizerCallback.onRecognizerResult(iFlyJsonResult);
-            }
+             parseGrammarResult(recognizerResult.getResultString());
         }
 
         @Override
         public void onError(SpeechError speechError) {
             LogUtil.d("duanyl============>speechError  :"+speechError.getErrorCode());
-
+            myhandler.postDelayed(runnable,500);
         }
 
         @Override
@@ -180,31 +177,47 @@ public class SpeechRecognizerService extends Service {
         }
     };
 
-
+//    {
+//        "sn": 1,
+//            "ls": true,
+//            "bg": 0,
+//            "ed": 0,
+//            "ws": [
+//        {
+//            "bg": 0,
+//                "cw": [
+//            {
+//                "sc": "72",
+//                    "gm": "0",
+//                    "w": "中风"
+//            },
+//            {
+//                "sc": "45",
+//                    "gm": "0",
+//                    "w": "烘干"
+//            }
+//            ]
+//        }
+//        ]
+//    }
     //解析语音识别后的JSON数据
-    public IFlyJsonResult parseGrammarResult(String json) {
+    public void parseGrammarResult(String json) {
         IFlyJsonResult mIFlyJsonResult = new IFlyJsonResult();
         try {
             LogUtil.d("duanyl==========>get  data " + json);
             JSONTokener tokener = new JSONTokener(json);
             JSONObject joResult = new JSONObject(tokener);
             JSONArray words = joResult.getJSONArray("ws");
-            LogUtil.d("duanyl==============sc==>" + joResult.getString("sc"));
-            mIFlyJsonResult.setConfidence(joResult.getString("sc"));
-            LogUtil.d("duanyl===============confidence=>" + mIFlyJsonResult.getConfidence());
             for (int i = 0; i < words.length(); i++) {
                 JSONArray items = words.getJSONObject(i).getJSONArray("cw");
-                //mIFlyJsonResult.addSlots(words.getJSONObject(i).getString("slot"));
-                JSONObject obj = items.getJSONObject(0);//曲该词槽的第一项
-                mIFlyJsonResult.addWords(obj.getString("w"));
+                JSONObject obj = items.getJSONObject(0);//曲该词组的第一项,第一项的分数最大
+                String score = obj.getString("sc");//分数
+                String word= obj.getString("w");
+                LogUtil.d("duanyl===============>word :" +word+",score:"+score);
             }
-            for (int h = 0; h < mIFlyJsonResult.slots.size(); h++) {
-                LogUtil.d("duanyl=========>  word " + mIFlyJsonResult.words.get(h));
-            }
+
         } catch (Exception e) {
             e.printStackTrace();
-            mIFlyJsonResult.setConfidence("0");
         }
-        return mIFlyJsonResult;
     }
 }

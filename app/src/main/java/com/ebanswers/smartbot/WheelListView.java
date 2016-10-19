@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.util.AttributeSet;
-import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
@@ -32,26 +31,29 @@ public class WheelListView extends ListView {
 
     public WheelListView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        setAdapter(new ListWheelAdapter());
+        setAdapter(adapter);
         setDivider(null);
         setOnScrollListener(new OnScrollListener() {
 
             public void onScrollStateChanged(AbsListView view, int scrollState) {
                 if (scrollState == OnScrollListener.SCROLL_STATE_IDLE) {
-                    adapter.notifyDataSetChanged();
-                    //setSelection(30 + getSelectionPosition() % (datas.size() / 2));
-                    setSelection(middlePosition);
-                    LogUtil.d("duanyl==============>onScrollStateChanged");
+                    //adapter.notifyDataSetChanged();
+//                    setSelection(getSelectionPosition() % (datas.size()));
+                    //setSelection(middlePosition);
+                    //adapter.setMiddlePos(middlePosition);
+                   // adapter.notifyDataSetChanged();
+                    LogUtil.d("duanyl==============>onScrollStateChanged:"+middlePosition+",getSelectionPosition:"+(getSelectionPosition() % (datas.size())));
                 }
             }
 
             public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-                middlePosition = firstVisibleItem + visibleItemCount / 2;         // lastPosition 为了防止同一重复回调
+                middlePosition = firstVisibleItem + visibleItemCount/2;         // lastPosition 为了防止同一重复回调
                  if (adapter != null && middlePosition != lastPosition) {
-                           adapter.setMiddlePos(middlePosition);
+                     adapter.setMiddlePos(middlePosition);
                      adapter.notifyDataSetChanged();
                  }
                 lastPosition = middlePosition;
+             LogUtil.d("duanyl=========>firstVisibleItem:"+firstVisibleItem+",middlePosition:"+middlePosition+",visibleItemCount:"+visibleItemCount+",getSelectionPosition:"+getSelectionPosition() % (datas.size()));
             }
         });
         setClipChildren(false);
@@ -111,12 +113,11 @@ public class WheelListView extends ListView {
             } else {
                 holder = (ListWheelHolder) convertView.getTag();
             }
-//
-//
-//            int index = position % (datas.size() / 2);
+
+//            int index = position % (datas.size() );
 //            String data = datas.get(index);
 //            holder.tv_num.setText(listdatas.get(index));
-//            if ((getSelectionPosition() % datas.size() + 1) % datas.size() == position % datas.size()) {
+//            if ((getSelectionPosition() % datas.size()) % datas.size() == position % datas.size()) {
 //                holder.tv_num.setTextColor(Color.BLUE);
 //                holder.tv_per.setVisibility(VISIBLE);
 //                selectText = holder.tv_num;

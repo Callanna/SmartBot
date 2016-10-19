@@ -1,6 +1,7 @@
 package com.ebanswers.smartlib.service;
 import android.app.Service;
 import android.content.Intent;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
@@ -47,9 +48,35 @@ public class SmartBotService extends Service {
             super.handleMessage(msg);
             if(msg.what == 0) {
                 startUnderstand();
+            }else if(msg.what == 1){
+                LogUtil.d("duanyl============>msg:"+msg.getData().getString("word"));
+                ttsManager.startSpeech( msg.getData().getString("word"), new TtsSpeakCallback() {
+                    @Override
+                    public void onStart() {
+                        stopUnderstand();
+                        stopListen = true;
+                    }
+
+                    @Override
+                    public void onEnd() {
+                        myhandler.sendEmptyMessageDelayed(0,1000);
+                        stopListen = false;
+                    }
+                });
             }
         }
     };
+
+    public void speechWords(String words){
+        myhandler.removeMessages(1);
+        Message msg = Message.obtain();
+        msg.what = 1;
+        Bundle bundle = new Bundle();
+        bundle.putString("word",words);
+        msg.setData(bundle);
+        myhandler.sendMessageDelayed(msg,500);
+    }
+
     public void startUnderstand() {
         understander.startUnderstanding(new SpeechUnderstandCallback() {
             @Override
@@ -61,36 +88,12 @@ public class SmartBotService extends Service {
             @Override
             public void onResultUnderstand(String result) {
                 LogUtil.d("duanyl==============onResultUnderstand>"+result);
-                ttsManager.startSpeech(result, new TtsSpeakCallback() {
-                    @Override
-                    public void onStart() {
-                        stopUnderstand();
-                        stopListen = true;
-                    }
-
-                    @Override
-                    public void onEnd() {
-                        myhandler.sendEmptyMessageDelayed(0,1000);
-                        stopListen = false;
-                    }
-                });
+                speechWords(result);
             }
 
             @Override
             public void onFail(String msg) {
-                ttsManager.startSpeech("亲！什么？我没听清楚，再说一次！", new TtsSpeakCallback() {
-                    @Override
-                    public void onStart() {
-                        stopUnderstand();
-                        stopListen = true;
-                    }
-
-                    @Override
-                    public void onEnd() {
-                        myhandler.sendEmptyMessageDelayed(0,1000);
-                        stopListen = false;
-                    }
-                });
+                speechWords("亲！我没听清楚!");
             }
         });
     }

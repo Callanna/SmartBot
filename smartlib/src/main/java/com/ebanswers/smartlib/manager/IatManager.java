@@ -6,7 +6,6 @@ import android.os.Environment;
 
 import com.ebanswers.smartlib.callback.IatResultCallback;
 import com.ebanswers.smartlib.util.LogUtil;
-import com.ebanswers.smartlib.util.TuningBotUtil;
 import com.iflytek.cloud.ErrorCode;
 import com.iflytek.cloud.InitListener;
 import com.iflytek.cloud.RecognizerListener;
@@ -35,7 +34,7 @@ public class IatManager {
         mIat = SpeechRecognizer.createRecognizer(context, mInitListener);
     }
 
-    private  InitListener mInitListener = new InitListener() {
+    private InitListener mInitListener = new InitListener() {
         @Override
         public void onInit(int code) {
             LogUtil.d("duanyl===========>SpeechRecognizer init() code = " + code);
@@ -52,7 +51,7 @@ public class IatManager {
         mIat.setParameter(SpeechConstant.PARAMS, null);
 
         // 设置听写引擎
-        mIat.setParameter(SpeechConstant.ENGINE_TYPE,SpeechConstant.TYPE_CLOUD);
+        mIat.setParameter(SpeechConstant.ENGINE_TYPE, SpeechConstant.TYPE_CLOUD);
         // 设置返回结果格式
         mIat.setParameter(SpeechConstant.RESULT_TYPE, "json");
         // 设置语言
@@ -60,18 +59,18 @@ public class IatManager {
         // 设置语言区域
         mIat.setParameter(SpeechConstant.ACCENT, "mandarin");
         // 设置语音前端点:静音超时时间，即用户多长时间不说话则当做超时处理
-        mIat.setParameter(SpeechConstant.VAD_BOS,   "4000" );
+        mIat.setParameter(SpeechConstant.VAD_BOS, "4000");
 
         // 设置语音后端点:后端点静音检测时间，即用户停止说话多长时间内即认为不再输入， 自动停止录音
-        mIat.setParameter(SpeechConstant.VAD_EOS,  "1000");
+        mIat.setParameter(SpeechConstant.VAD_EOS, "1000");
 
         // 设置标点符号,设置为"0"返回结果无标点,设置为"1"返回结果有标点
-        mIat.setParameter(SpeechConstant.ASR_PTT,  "1" );
+        mIat.setParameter(SpeechConstant.ASR_PTT, "1");
 
         // 设置音频保存路径，保存音频格式支持pcm、wav，设置路径为sd卡请注意WRITE_EXTERNAL_STORAGE权限
         // 注：AUDIO_FORMAT参数语记需要更新版本才能生效
-        mIat.setParameter(SpeechConstant.AUDIO_FORMAT,"wav");
-        mIat.setParameter(SpeechConstant.ASR_AUDIO_PATH, Environment.getExternalStorageDirectory()+"/msc/iat.wav");
+        mIat.setParameter(SpeechConstant.AUDIO_FORMAT, "wav");
+        mIat.setParameter(SpeechConstant.ASR_AUDIO_PATH, Environment.getExternalStorageDirectory() + "/msc/iat.wav");
 
     }
 
@@ -84,25 +83,26 @@ public class IatManager {
         }
     }
 
-    public void startRecognize(IatResultCallback callback){
-        if(mIat != null){
+    public void startRecognize(IatResultCallback callback) {
+        if (mIat != null) {
             this.callback = callback;
             mIat.startListening(mRecognizerListener);
         }
     }
 
-    public void stopRecognize(){
-        if(mIat != null){
+    public void stopRecognize() {
+        if (mIat != null) {
             mIat.stopListening();
         }
     }
 
-    public void destory(){
-        if(mIat != null){
+    public void destory() {
+        if (mIat != null) {
             mIat.cancel();
             mIat.destroy();
         }
     }
+
     /**
      * 听写监听器。
      */
@@ -119,7 +119,7 @@ public class IatManager {
             // Tips：
             // 错误码：10118(您没有说话)，可能是录音机权限被禁，需要提示用户打开应用的录音权限。
             // 如果使用本地功能（语记）需要提示用户开启语记的录音权限。
-            LogUtil.d("duanyl=================>"+error.getPlainDescription(true));
+            LogUtil.d("duanyl=================>" + error.getPlainDescription(true));
             callback.onfail(error.toString());
         }
 
@@ -132,11 +132,8 @@ public class IatManager {
 
         @Override
         public void onResult(RecognizerResult results, boolean isLast) {
-            LogUtil.d("duanyl=================>"+results.getResultString());
-            if (isLast) {//最后的结果
-                String result= parseResult(results.getResultString());
-                callback.onResult(smartBotAnswer(result));
-            }
+            LogUtil.d("duanyl=================>" + results.getResultString());
+            parseResult(results.getResultString());
         }
 
         @Override
@@ -155,28 +152,34 @@ public class IatManager {
         }
     };
 
-    private String smartBotAnswer(String result) {
-        String answer = TuningBotUtil.sendMsg(result);
-        return answer;
-    }
+    String listenResult = "";
 
-    private String parseResult(String resultString) {
-        StringBuffer ret = new StringBuffer();
+    private void parseResult(String resultString) {
+        LogUtil.d("duanyl===========>result:" + resultString);
         try {
             JSONTokener tokener = new JSONTokener(resultString);
             JSONObject joResult = new JSONObject(tokener);
-
+            boolean ls = joResult.getBoolean("ls");//是否是最后一句
             JSONArray words = joResult.getJSONArray("ws");
+            StringBuffer ret = new StringBuffer();
             for (int i = 0; i < words.length(); i++) {
-                // 转写结果词，默认使用第一个结果
                 JSONArray items = words.getJSONObject(i).getJSONArray("cw");
-                JSONObject obj = items.getJSONObject(0);
-                ret.append(obj.getString("w"));
+                for (int j = 0; j < items.length(); j++) {
+                    JSONObject obj = items.getJSONObject(j);
+                    ret.append(obj.getString("w"));
+                }
             }
+            listenResult = listenResult + "" + ret;
+            if (ls) {//如果是最后一句。
+                LogUtil.d("duanyl============>listenResult:" + listenResult);
+                if (callback != null)
+                    callback.onResult(listenResult);
+                listenResult = "";
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return ret.toString();
     }
 
 

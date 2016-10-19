@@ -7,6 +7,6 @@
     android:layout_height="match_parent">
       <com.ebanswers.smartbot.WheelListView
           android:layout_width="match_parent"
-          android:layout_height="120dp"
+          android:layout_height="140dp"
           ></com.ebanswers.smartbot.WheelListView>
 </LinearLayout>

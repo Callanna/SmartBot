@@ -21,42 +21,48 @@ public class TuningBotUtil {
 
     /**
      * 发送一个消息，并得到返回的消息
+     *
      * @param msg
      * @return
      */
-    public static String sendMsg(String msg)
-    {
+    public static String sendMsg(String msg) {
         String answer = "sorry!我也无能为力了！";
-        LogUtil.d("duanyl==============>msg:"+msg);
+        LogUtil.d("duanyl==============>msg:" + msg);
         String url = setParams(msg);
-        String res = doGet(url);
-        if(!res.equals("")) {
+        String res = null;
+        try {
+            res = doGet(url);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        LogUtil.d("duanyl===========res:" + res);
+        if (!res.equals("")) {
             try {
                 JSONObject jsonObject = new JSONObject(res);
                 int code = jsonObject.getInt("code");
                 String text = jsonObject.getString("text");
-                if (!(code > 40000 || text.equals("") || text == null)) {
+                if (!(code < 40000 || text.equals("") || text == null)) {
                     answer = text;
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
+
+        LogUtil.d("duanyl============>answer:" + answer);
         return answer;
     }
 
     /**
      * 拼接Url
+     *
      * @param msg
      * @return
      */
-    private static String setParams(String msg)
-    {
-        try
-        {
+    private static String setParams(String msg) {
+        try {
             msg = URLEncoder.encode(msg, "UTF-8");
-        } catch (UnsupportedEncodingException e)
-        {
+        } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
         return TULINGURL + "?key=" + API_KEY + "&info=" + msg;
@@ -64,68 +70,42 @@ public class TuningBotUtil {
 
     /**
      * Get请求，获得返回数据
+     *
      * @param urlStr
      * @return
      */
-    private static String doGet(String urlStr)
-    {
+    private static String doGet(String urlStr) throws IOException {
+        LogUtil.d("duanyl=============>urlstr:" + urlStr);
         URL url = null;
         HttpURLConnection conn = null;
         InputStream is = null;
         ByteArrayOutputStream baos = null;
-        try
-        {
-            url = new URL(urlStr);
-            conn = (HttpURLConnection) url.openConnection();
-            conn.setReadTimeout(5 * 1000);
-            conn.setConnectTimeout(5 * 1000);
-            conn.setRequestMethod("GET");
-            if (conn.getResponseCode() == 200)
-            {
-                is = conn.getInputStream();
-                baos = new ByteArrayOutputStream();
-                int len = -1;
-                byte[] buf = new byte[128];
+        url = new URL(urlStr);
+        conn = (HttpURLConnection) url.openConnection();
+        conn.setReadTimeout(8000);
+        conn.setConnectTimeout(8000);
+        conn.setRequestMethod("GET");
+        conn.setRequestProperty("accept", "*/*");
+        conn.setRequestProperty("connection", "Keep-Alive");
+        int code = conn.getResponseCode();
+        if (code >= 200 && code < 300) {
+            is = conn.getInputStream();
+            baos = new ByteArrayOutputStream();
+            int len = -1;
+            byte[] buf = new byte[128];
 
-                while ((len = is.read(buf)) != -1)
-                {
-                    baos.write(buf, 0, len);
-                }
-                baos.flush();
-                return baos.toString();
-            } else
-            {
-               LogUtil.d("服务器连接错误！");
+            while ((len = is.read(buf)) != -1) {
+                baos.write(buf, 0, len);
             }
-
-        } catch (Exception e)
-        {
-            e.printStackTrace();
-            LogUtil.d("服务器连接错误！");
-        } finally
-        {
-            try
-            {
-                if (is != null)
-                    is.close();
-            } catch (IOException e)
-            {
-                e.printStackTrace();
-            }
-
-            try
-            {
-                if (baos != null)
-                    baos.close();
-            } catch (IOException e)
-            {
-                e.printStackTrace();
-            }
+            baos.flush();
+            is.close();
+            byte[] result = baos.toByteArray();
+            baos.close();
             conn.disconnect();
-        }
-        if(baos != null) {
-            return baos.toString();
-        }else{
+            LogUtil.d("duanyl==========>response:" + new String(result));
+            return new String(result);
+        } else {
+            LogUtil.d("服务器连接错误！response code:" + code);
             return "";
         }
     }
