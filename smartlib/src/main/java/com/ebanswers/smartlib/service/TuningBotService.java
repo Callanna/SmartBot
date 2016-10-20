@@ -54,21 +54,25 @@ public class TuningBotService extends Service {
                 myhandler.sendEmptyMessageDelayed(0, 1000);
             }
         }
-
         @Override
         public void onResult(String text) {
-            String answer = smartBotAnswer(text);
-            speechWords(answer);
+            TuningBotUtil.sendMsg(text, new TuningBotUtil.AnswerCallBack() {
+                @Override
+                public void onAnswer(String msg) {
+                    speechWords(msg);
+                }
+            });
         }
 
         @Override
         public void onfail(String msg) {
-            speechWords("亲！我没听清楚!");
+            //speechWords("亲！我没听清楚!");
         }
     };
     TtsSpeakCallback ttsSpeakCallback = new TtsSpeakCallback() {
         @Override
         public void onStart() {
+            LogUtil.d("Duanyl=============ttsSpeakCallback>onStart");
             stopUnderstand();
             stopListen = true;
         }
@@ -114,15 +118,7 @@ public class TuningBotService extends Service {
         myhandler.sendMessageDelayed(msg,500);
     }
     String answer = "";
-    private String smartBotAnswer(final String result) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-               answer = TuningBotUtil.sendMsg(result);
-            }
-        }).start();
-        return answer;
-    }
+
 
     @Override
     public void onLowMemory() {

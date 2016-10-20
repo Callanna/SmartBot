@@ -25,32 +25,30 @@ public class TuningBotUtil {
      * @param msg
      * @return
      */
-    public static String sendMsg(String msg) {
-        String answer = "sorry!我也无能为力了！";
+    public static void sendMsg(String msg, final AnswerCallBack callBack) {
         LogUtil.d("duanyl==============>msg:" + msg);
         String url = setParams(msg);
-        String res = null;
-        try {
-            res = doGet(url);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        LogUtil.d("duanyl===========res:" + res);
-        if (!res.equals("")) {
-            try {
-                JSONObject jsonObject = new JSONObject(res);
-                int code = jsonObject.getInt("code");
-                String text = jsonObject.getString("text");
-                if (!(code < 40000 || text.equals("") || text == null)) {
-                    answer = text;
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
 
-        LogUtil.d("duanyl============>answer:" + answer);
-        return answer;
+        doGetAnsync(url, new AnswerCallBack() {
+            @Override
+            public void onAnswer(String answerjson) {
+                if (!answerjson.equals("")) {
+                    try {
+                        String answer = "";
+                        JSONObject jsonObject = new JSONObject(answerjson);
+                        int code = jsonObject.getInt("code");
+                        String text = jsonObject.getString("text");
+                        if (!(code < 40000 || text.equals("") || text == null)) {
+                            answer = text;
+                            LogUtil.d("duanyl============>answer:" + answer);
+                            callBack.onAnswer(answer);
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
     }
 
     /**
@@ -67,7 +65,19 @@ public class TuningBotUtil {
         }
         return TULINGURL + "?key=" + API_KEY + "&info=" + msg;
     }
-
+  private static void doGetAnsync(final String urlStr, final AnswerCallBack callBack){
+    new Thread(new Runnable() {
+        @Override
+        public void run() {
+            try {
+               String answer = doGet(urlStr);
+                callBack.onAnswer(answer);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }).start();
+  }
     /**
      * Get请求，获得返回数据
      *
@@ -108,5 +118,8 @@ public class TuningBotUtil {
             LogUtil.d("服务器连接错误！response code:" + code);
             return "";
         }
+    }
+    public interface AnswerCallBack {
+        void onAnswer(String msg);
     }
 }
