@@ -36,7 +36,10 @@
         <meta-data
             android:name="smartCommand"
             android:value="打开|关闭|小风|大风|中风|消毒|烘干|开灯|关灯"></meta-data>
-
+        <!--  baidu -->
+        <meta-data android:name="com.baidu.speech.APP_ID" android:value="8772108"/>
+        <meta-data android:name="com.baidu.speech.API_KEY" android:value="YfLqCpnYbt6UvfLizcHUF9vZ"/>
+        <meta-data android:name="com.baidu.speech.SECRET_KEY" android:value="2377a9081ccc3c9931239b430c5665c7"/>
     </application>
 
 </manifest>

@@ -213,8 +213,10 @@ public class SpeechRecognizerService extends Service {
                 JSONObject obj = items.getJSONObject(0);//曲该词组的第一项,第一项的分数最大
                 String score = obj.getString("sc");//分数
                 String word= obj.getString("w");
+                mIFlyJsonResult.addWords(word);
                 LogUtil.d("duanyl===============>word :" +word+",score:"+score);
             }
+            iflyRecognizerCallback.onRecognizerResult(mIFlyJsonResult);
 
         } catch (Exception e) {
             e.printStackTrace();

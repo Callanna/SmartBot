@@ -110,7 +110,29 @@
 
     </LinearLayout>
 
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="100dp">
+         <Button
+             android:id="@+id/btn_wakestart"
+             android:text="唤醒识别Start"
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content" />
+         <Button
+            android:id="@+id/btn_wakestop"
+            android:text="唤醒识别Stop"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
+    <TextView
+        android:id="@+id/tv_result"
+        android:text="sdsdsd"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
     <Button
+        android:visibility="gone"
         android:id="@+id/btn_view"
         android:text="WheelListView"
         android:layout_width="match_parent"
