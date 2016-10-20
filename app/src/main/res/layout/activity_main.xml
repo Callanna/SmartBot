@@ -116,15 +116,19 @@
         android:layout_height="100dp">
          <Button
              android:id="@+id/btn_wakestart"
-             android:text="唤醒识别Start"
+             android:text="唤醒+讯飞识别Start"
              android:layout_width="wrap_content"
              android:layout_height="wrap_content" />
          <Button
-            android:id="@+id/btn_wakestop"
-            android:text="唤醒识别Stop"
+            android:id="@+id/btn_baiduwake"
+            android:text="唤醒+百度识别Start"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
-
+        <Button
+            android:id="@+id/btn_baidutts"
+            android:text="百度合成"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
     </LinearLayout>
     <TextView
         android:id="@+id/tv_result"

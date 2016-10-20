@@ -8,6 +8,9 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.ebanswers.smartlib.SmartBot;
+import com.ebanswers.smartlib.baiduapi.LocalTtsWomen;
+import com.ebanswers.smartlib.baiduapi.OfflineWakeAsrer;
+import com.ebanswers.smartlib.baiduapi.WakeArser;
 import com.ebanswers.smartlib.callback.IFLYRecognizerCallback;
 import com.ebanswers.smartlib.callback.IatResultCallback;
 import com.ebanswers.smartlib.data.IFlyJsonResult;
@@ -15,6 +18,8 @@ import com.ebanswers.smartlib.manager.IatManager;
 import com.ebanswers.smartlib.baiduapi.WakeUper;
 import com.ebanswers.smartlib.util.Constant;
 import com.ebanswers.smartlib.util.LogUtil;
+
+import java.util.ArrayList;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -64,12 +69,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         ButterKnife.bind(this);
         SmartBot.init(this);
         WakeUper.getInstance(this);
+        LocalTtsWomen.getInstance(MainActivity.this);
     }
 
 
     @OnClick({R.id.btn_init_speechrecognize, R.id.btn_speechrecognizer, R.id.btn_stoprecognize, R.id.btn_destroy_recognize, R.id.btn_init_smartbot,
             R.id.btn_smartbot_start, R.id.btn_smartbot_stop, R.id.btn_destroy_smartbot, R.id.btn_init_tuningbot, R.id.btn_tuningbot_start,
-            R.id.btn_tuningbot_stop, R.id.btn_destroy_tuningbot, R.id.btn_view, R.id.btn_wakestart, R.id.btn_wakestop})
+            R.id.btn_tuningbot_stop, R.id.btn_destroy_tuningbot, R.id.btn_view, R.id.btn_wakestart, R.id.btn_baiduwake,R.id.btn_baidutts})
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btn_init_speechrecognize:
@@ -128,47 +134,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.btn_view:
                 startActivity(new Intent(MainActivity.this, SecondActivity.class));
                 break;
-
             case R.id.btn_wakestart:
-                WakeUper.getInstance(MainActivity.this).start("WakeUp.bin", new WakeUper.WakeUpListener() {
-                    @Override
-                    public void onResult(String data) {
-                        LogUtil.d("duanyl==============>wake up data"+data);
-                        IatManager.getInstance(MainActivity.this).startRecognize(new IatResultCallback() {
-                            @Override
-                            public void onEndSpeech() {
-
-                            }
-
-                            @Override
-                            public void onResult(final String text) {
-                                tv_result.post(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        tv_result.setText(text);
-                                    }
-                                });
-                            }
-
-                            @Override
-                            public void onfail(String msg) {
-
-                            }
-                        });
-                    }
-
-                    @Override
-                    public void onExit() {
-
-                    }
-                });
+                WakeArser.getInstance(MainActivity.this).start("WakeUp.bin");
                 break;
-            case R.id.btn_wakestop:
-                WakeUper.getInstance(MainActivity.this).stop();
+            case R.id.btn_baiduwake:
+                OfflineWakeAsrer.getInstance(MainActivity.this).start("WakeUp.bin");
+                break;
+            case R.id.btn_baidutts:
+                LocalTtsWomen.getInstance(MainActivity.this).speak("欢迎使用百度语音合成SDK,百度语音为你提供支持。");
                 break;
         }
     }
-
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK) {
+            Bundle results = data.getExtras();
+            ArrayList<String> results_recognition = results.getStringArrayList("results_recognition");
+            LogUtil.d("duanyl================>识别结果(数组形式): " + results_recognition + "\n");
+        }
+    }
     @Override
     protected void onDestroy() {
         super.onDestroy();
