@@ -9,13 +9,10 @@ import android.widget.TextView;
 
 import com.ebanswers.smartlib.SmartBot;
 import com.ebanswers.smartlib.baiduapi.LocalTtsWomen;
-import com.ebanswers.smartlib.baiduapi.OfflineWakeAsrer;
 import com.ebanswers.smartlib.baiduapi.WakeArser;
-import com.ebanswers.smartlib.callback.IFLYRecognizerCallback;
-import com.ebanswers.smartlib.callback.IatResultCallback;
-import com.ebanswers.smartlib.data.IFlyJsonResult;
-import com.ebanswers.smartlib.manager.IatManager;
 import com.ebanswers.smartlib.baiduapi.WakeUper;
+import com.ebanswers.smartlib.callback.IFLYRecognizerCallback;
+import com.ebanswers.smartlib.data.IFlyJsonResult;
 import com.ebanswers.smartlib.util.Constant;
 import com.ebanswers.smartlib.util.LogUtil;
 
@@ -72,10 +69,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         LocalTtsWomen.getInstance(MainActivity.this);
     }
 
-
     @OnClick({R.id.btn_init_speechrecognize, R.id.btn_speechrecognizer, R.id.btn_stoprecognize, R.id.btn_destroy_recognize, R.id.btn_init_smartbot,
             R.id.btn_smartbot_start, R.id.btn_smartbot_stop, R.id.btn_destroy_smartbot, R.id.btn_init_tuningbot, R.id.btn_tuningbot_start,
-            R.id.btn_tuningbot_stop, R.id.btn_destroy_tuningbot, R.id.btn_view, R.id.btn_wakestart, R.id.btn_baiduwake,R.id.btn_baidutts})
+            R.id.btn_tuningbot_stop, R.id.btn_destroy_tuningbot, R.id.btn_view, R.id.btn_wakestart, R.id.btn_iat,R.id.btn_baidutts})
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btn_init_speechrecognize:
@@ -137,11 +133,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.btn_wakestart:
                 WakeArser.getInstance(MainActivity.this).start("WakeUp.bin");
                 break;
-            case R.id.btn_baiduwake:
-                OfflineWakeAsrer.getInstance(MainActivity.this).start("WakeUp.bin");
+            case R.id.btn_iat:
+
                 break;
             case R.id.btn_baidutts:
-                LocalTtsWomen.getInstance(MainActivity.this).speak("欢迎使用百度语音合成SDK,百度语音为你提供支持。");
+                LocalTtsWomen.getInstance(MainActivity.this).speak("百度一下");
                 break;
         }
     }

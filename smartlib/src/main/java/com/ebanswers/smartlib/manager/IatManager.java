@@ -6,6 +6,7 @@ import android.os.Environment;
 
 import com.ebanswers.smartlib.callback.IatResultCallback;
 import com.ebanswers.smartlib.util.LogUtil;
+import com.ebanswers.smartlib.view.SpeechDialog;
 import com.iflytek.cloud.ErrorCode;
 import com.iflytek.cloud.InitListener;
 import com.iflytek.cloud.RecognizerListener;
@@ -28,9 +29,13 @@ public class IatManager {
     // 语音听写对象
     private SpeechRecognizer mIat;
 
+    private SpeechDialog speechDialog;
+
+    private boolean isAllowShow;
+
     private IatManager(Context context) {
         // 使用SpeechRecognizer对象，可根据回调消息自定义界面；
-
+        speechDialog = new SpeechDialog(context);
         mIat = SpeechRecognizer.createRecognizer(context, mInitListener);
     }
 
@@ -83,7 +88,11 @@ public class IatManager {
         }
     }
 
-    public void startRecognize(IatResultCallback callback) {
+    public void startRecognize(IatResultCallback callback,boolean isshow) {
+        isAllowShow = isshow;
+        if(isshow){
+            speechDialog.show();
+        }
         if (mIat != null) {
             this.callback = callback;
             mIat.startListening(mRecognizerListener);
@@ -91,6 +100,9 @@ public class IatManager {
     }
 
     public void stopRecognize() {
+        if(speechDialog.isShown()){
+            speechDialog.hide();
+        }
         if (mIat != null) {
             mIat.stopListening();
             mIat.cancel();
@@ -99,7 +111,7 @@ public class IatManager {
 
     public void destory() {
         if (mIat != null) {
-            mIat.cancel();
+            stopRecognize();
             mIat.destroy();
         }
     }
@@ -113,6 +125,9 @@ public class IatManager {
         public void onBeginOfSpeech() {
             // 此回调表示：sdk内部录音机已经准备好了，用户可以开始语音输入
             LogUtil.d("duanyl=================>开始说话");
+            if(isAllowShow){
+                speechDialog.setTip("开始说话");
+            }
         }
 
         @Override
@@ -122,6 +137,9 @@ public class IatManager {
             // 如果使用本地功能（语记）需要提示用户开启语记的录音权限。
             LogUtil.d("duanyl=================>" + error.getPlainDescription(true));
             callback.onfail(error.toString());
+            if(isAllowShow){
+                speechDialog.setTip("error:"+error.getPlainDescription(true));
+            }
         }
 
         @Override
@@ -129,6 +147,10 @@ public class IatManager {
             // 此回调表示：检测到了语音的尾端点，已经进入识别过程，不再接受语音输入
             LogUtil.d("duanyl=================>结束说话");
             callback.onEndSpeech();
+            if(isAllowShow){
+                speechDialog.setTip("结束说话");
+            }
+
         }
 
         @Override
@@ -140,6 +162,10 @@ public class IatManager {
         @Override
         public void onVolumeChanged(int volume, byte[] data) {
             LogUtil.d("duanyl=================>当前正在说话，音量大小：" + volume);
+            if(isAllowShow){
+                speechDialog.volumChanged(volume);
+                speechDialog.setTip("识别中...");
+            }
         }
 
         @Override
@@ -173,6 +199,9 @@ public class IatManager {
             listenResult = listenResult + "" + ret;
             if (ls) {//如果是最后一句。
                 LogUtil.d("duanyl============>listenResult:" + listenResult);
+                if(isAllowShow){
+                    speechDialog.setTip(listenResult);
+                }
                 if (callback != null)
                     callback.onResult(listenResult);
                 listenResult = "";

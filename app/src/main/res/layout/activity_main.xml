@@ -120,13 +120,14 @@
              android:layout_width="wrap_content"
              android:layout_height="wrap_content" />
          <Button
-            android:id="@+id/btn_baiduwake"
-            android:text="唤醒+百度识别Start"
+            android:id="@+id/btn_iat"
+            android:text="识别"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
         <Button
             android:id="@+id/btn_baidutts"
             android:text="百度合成"
+            android:visibility="gone"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
     </LinearLayout>

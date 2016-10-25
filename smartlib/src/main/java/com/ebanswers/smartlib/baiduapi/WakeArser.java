@@ -24,7 +24,7 @@ public class WakeArser {
     public static WakeArser instance;
     public  Context mContext;
     private EventManager mWpEventManager;
-
+    private IwakeListener listener;
     private WakeArser(Context context){
         mContext = context;
         // 1) 创建唤醒事件管理器
@@ -55,7 +55,7 @@ public class WakeArser {
                             public void onfail(String msg) {
                                restart();
                             }
-                        });
+                        },true);
                     } else if ("wp.exit".equals(name)) {
 
                         LogUtil.d("duanyl===========>" + params + "\r\n");
@@ -72,6 +72,7 @@ public class WakeArser {
         myhandler.postDelayed(new Runnable() {
             @Override
             public void run() {
+                IatManager.getInstance(mContext).stopRecognize();
                 start(mResname);
             }
         },1000) ;
@@ -85,14 +86,28 @@ public class WakeArser {
      private String mResname;
 
     public void start(String resname){
+        if(listener != null){
+            listener.isGongingOn(true);
+        }
         mResname = resname;
         // 3) 通知唤醒管理器, 启动唤醒功能
         HashMap params = new HashMap();
         params.put("kws-file", "assets:///"+resname); // 设置唤醒资源
         mWpEventManager.send("wp.start", new JSONObject(params).toString(), null, 0, 0);
     }
+
+    public void setWakeListener(IwakeListener listener){
+        this.listener = listener;
+    }
     public void stop(){
         // 停止唤醒监听
+        if(listener != null){
+            listener.isGongingOn(false);
+        }
         mWpEventManager.send("wp.stop", null, null, 0, 0);
+    }
+
+    interface IwakeListener{
+        void isGongingOn(boolean falg);
     }
 }

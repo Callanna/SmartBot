@@ -14,6 +14,7 @@ import com.ebanswers.smartlib.callback.IFLYRecognizerCallback;
 import com.ebanswers.smartlib.data.IFlyJsonResult;
 import com.ebanswers.smartlib.util.Constant;
 import com.ebanswers.smartlib.util.LogUtil;
+import com.ebanswers.smartlib.view.SpeechDialog;
 import com.iflytek.cloud.ErrorCode;
 import com.iflytek.cloud.GrammarListener;
 import com.iflytek.cloud.InitListener;
@@ -34,7 +35,7 @@ public class SpeechRecognizerService extends Service {
     protected Context mContext;
     private String grammar =  "";
     private String grammarID = "";
-
+    private SpeechDialog speechDialog;
     // 语音识别对象
     private SpeechRecognizer mAsr;
 
@@ -58,6 +59,7 @@ public class SpeechRecognizerService extends Service {
         grammar = String.format(Constant.GARMMAR,SmartBot.command);
         // 初始化识别对象
         mAsr = SpeechRecognizer.createRecognizer(mContext, mInitListener);
+        speechDialog = new SpeechDialog(mContext);
         LogUtil.d("duanyl=================>onCreate"+grammar);
     }
 
@@ -100,6 +102,7 @@ public class SpeechRecognizerService extends Service {
     }
 
     public void startListening() {
+        speechDialog.show();
         int ret = mAsr.startListening(mRecognizerListener);
         if (ret != ErrorCode.SUCCESS) {
             LogUtil.d("duanyl============>识别失败,错误码: " + ret);
@@ -107,6 +110,7 @@ public class SpeechRecognizerService extends Service {
     }
 
     public void stopListening(){
+        speechDialog.hide();
         if(mAsr != null){
             mAsr.stopListening();
             mAsr.cancel();
@@ -122,7 +126,7 @@ public class SpeechRecognizerService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mAsr.cancel();
+        stopListening();
         mAsr.destroy();
     }
     private InitListener mInitListener = new InitListener() {
@@ -146,10 +150,12 @@ public class SpeechRecognizerService extends Service {
         @Override
         public void onVolumeChanged(int i, byte[] bytes) {
             LogUtil.d("duanyl============>onVolumeChanged i "+i);
+            speechDialog.setTip("识别中...");
         }
 
         @Override
         public void onBeginOfSpeech() {
+            speechDialog.setTip("开始说话");
             LogUtil.d("duanyl============>onBeginOfSpeech  ");
         }
 
@@ -157,6 +163,7 @@ public class SpeechRecognizerService extends Service {
         public void onEndOfSpeech() {
             LogUtil.d("duanyl============>onEndOfSpeech  ");
             myhandler.postDelayed(runnable,500);
+            speechDialog.setTip("结束说话");
         }
 
         @Override
@@ -169,6 +176,7 @@ public class SpeechRecognizerService extends Service {
         public void onError(SpeechError speechError) {
             LogUtil.d("duanyl============>speechError  :"+speechError.getErrorCode());
             myhandler.postDelayed(runnable,500);
+            speechDialog.setTip("error:"+speechError.getErrorCode());
         }
 
         @Override
